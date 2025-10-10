@@ -174,17 +174,18 @@ const ReadingPlanner = () => {
                 {day.psalms.length > 0 ? (
                   <>
                     Salmos{" "}
-                    {day.psalms
-                      .map((p) =>
-                        SPECIAL_PSALMS.includes(p) ? (
-                          <strong key={p} className="text-primary">
-                            {p}
-                          </strong>
+                    {day.psalms.map((p, index) => (
+                      // Use uma vírgula entre os Salmos, exceto o último
+                      <span key={p}>
+                        {SPECIAL_PSALMS.includes(p) ? (
+                          <strong className="text-primary">{p}</strong>
                         ) : (
-                          p
-                        )
-                      )
-                      .join(", ")}
+                          <span>{p}</span>
+                        )}
+                        {/* Adiciona a vírgula e o espaço se não for o último elemento */}
+                        {index < day.psalms.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
                   </>
                 ) : (
                   <strong className="text-yellow-500">REVISÃO SEMANAL</strong>
@@ -325,7 +326,7 @@ const ReadingPlanner = () => {
             </span>
           </div>
           <Progress value={progress} className="h-2 bg-muted/50" />
-          
+
           {/* <div className="mt-4 flex justify-end">
             
             <Button
@@ -335,7 +336,6 @@ const ReadingPlanner = () => {
               Exportar para PDF
             </Button>
           </div> */}
-          
         </div>
 
         <Separator className="my-4" />
