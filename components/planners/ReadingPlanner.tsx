@@ -4,7 +4,7 @@
 
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // Importa toda a lógica do plano de leitura
 import {
     END_DATE,
@@ -17,10 +17,17 @@ import {
     generatePlanData,
     isRevisionDay,
 } from "@/lib/planner-utils";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const ReadingPlanner = () => {
+  // 1. Crie a referência para o container principal
+  const plannerRef = useRef<HTMLDivElement>(null);
   // Geração de Dados: Chamada única para montar todo o plano
   const planData = useMemo(() => generatePlanData(), []);
+
+  // 2. Função de exportação para PDF
+  // (Removido: função duplicada handleExportPdf)
 
   const [activeView, setActiveView] = useState<"weekly" | "daily">("daily");
   const [progress, setProgress] = useState(0);
@@ -203,8 +210,70 @@ const ReadingPlanner = () => {
     </div>
   );
 
+  // 2. Função de exportação para PDF
+  const handleExportPdf = async () => {
+    if (!plannerRef.current) return;
+
+    // Indicador de carregamento (opcional, mas recomendado para UX)
+    // Você pode usar um useState para desabilitar o botão.
+    // setExporting(true);
+
+    try {
+      // A. Capturar a Visualização: Usa html2canvas para renderizar o DOM em um Canvas
+      const canvas = await html2canvas(plannerRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        // [NOVA OPÇÃO]
+        allowTaint: true, // Adicione esta linha
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
+
+      // B. Criar o PDF
+      const pdf = new jsPDF("p", "mm", "a4"); // 'p': retrato, 'mm': milímetros, 'a4'
+
+      // Largura da página A4 em mm
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Largura e Altura do canvas
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+
+      // Calcula a proporção para caber na página
+      const ratio = imgHeight / imgWidth;
+      const finalHeight = pdfWidth * ratio;
+
+      // Se o conteúdo for maior que uma página (e será), o jspdf precisa de múltiplos 'addPage'
+      let heightLeft = finalHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, finalHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - finalHeight; // Move a imagem para o próximo ponto de corte
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, pdfWidth, finalHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      // C. Salvar o arquivo
+      pdf.save(
+        `Plano_Leitura_Salmos_${formatDate(START_DATE).replace(/\//g, "-")}.pdf`
+      );
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Erro ao gerar o PDF. Tente novamente.");
+    } finally {
+      // setExporting(false);
+    }
+  };
+
   return (
-    <div className="w-full">
+    // 3. ATRIBUIR A REFERÊNCIA ao container que você quer exportar
+    <div className="w-full" ref={plannerRef}>
       {/* Header: Usa Primary Color */}
       <div className="bg-primary text-primary-foreground p-6 text-center rounded-lg shadow-xl">
         <h1 className="text-2xl font-bold tracking-tight">
@@ -256,6 +325,17 @@ const ReadingPlanner = () => {
             </span>
           </div>
           <Progress value={progress} className="h-2 bg-muted/50" />
+          
+          {/* <div className="mt-4 flex justify-end">
+            
+            <Button
+              onClick={handleExportPdf}
+              className="bg-green-600 hover:bg-green-700 text-white shadow-md transition-colors"
+            >
+              Exportar para PDF
+            </Button>
+          </div> */}
+          
         </div>
 
         <Separator className="my-4" />
