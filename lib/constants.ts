@@ -1,7 +1,4 @@
 export const navItems = [
-  { label: "Home", href: "/" },
-  { label: "Categories", href: "/categories" },
-  { label: "Blog", href: "/blog" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Início", href: "/" },
+  { label: "Blog e Sermões", href: "/blog" },
 ];

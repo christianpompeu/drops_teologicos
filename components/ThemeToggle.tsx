@@ -3,41 +3,36 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Switch } from "./ui/switch";
+import { Button } from "./ui/button";
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
     return (
-      <div className="flex items-center space-x-2">
-        <Sun className={`h-4 w-4 transition-colors `} />
-        <Switch disabled />
-        <Moon className={`h-4 w-4 transition-colors `} />
-      </div>
+      <Button variant="ghost" size="icon" className="w-9 h-9" disabled>
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
+      </Button>
     );
   }
 
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
+
   return (
-    <div className="flex items-center space-x-2">
-      <Sun
-        className={`h-4 w-4 transition-colors ${
-          theme === "light" ? "text-yellow-500" : "text-muted-foreground"
-        } `}
-      />
-      <Switch
-        checked={theme === "dark"}
-        onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-      />
-      <Moon
-        className={`h-4 w-4 transition-colors ${
-          theme === "dark" ? "text-yellow-500" : "text-muted-foreground"
-        }`}
-      />
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleTheme}
+      className="w-9 h-9 relative hover:bg-primary/10 transition-colors"
+    >
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   );
 }
