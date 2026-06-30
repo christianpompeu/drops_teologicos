@@ -25,7 +25,7 @@ export const mockSermons: Sermon[] = [
     speaker: "Pr. Marcos Silva",
     date: "2026-06-21",
     excerpt: "Descobrindo a esperança em tempos de provação e como a fé nos guia quando tudo parece perdido.",
-    imageUrl: "https://images.unsplash.com/photo-1548625361-ec8536f00eb3?q=80&w=1200&auto=format&fit=crop", // Majestic cross or light in church
+    imageUrl: "https://images.unsplash.com/photo-1507692049590-b9df70138cd3?q=80&w=1200&auto=format&fit=crop", // Cross on hill
     duration: "45:20"
   },
   {

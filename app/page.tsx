@@ -1,5 +1,6 @@
 import HeroSection from "@/components/HeroSection";
 import LatestSermons from "@/components/LatestSermons";
+import CourseBanner from "@/components/CourseBanner";
 
 export default function Home() {
   return (
@@ -7,6 +8,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <LatestSermons />
+        <CourseBanner />
       </main>
     </div>
   );
